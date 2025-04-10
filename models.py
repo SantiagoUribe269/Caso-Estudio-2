@@ -1,4 +1,4 @@
-from sqlmodel import Field, SQLModel, Relationship
+from sqlmodel import Field, SQLModel, Relationship, UniqueConstraint
 from typing import Optional, List
 from datetime import datetime
 from datetime import timezone
@@ -35,12 +35,12 @@ class CocheraBase(SQLModel):
     dueno_id: uuid.UUID = Field(foreign_key="dueno.id")
 
 class Cochera(CocheraBase, table=True):
+    __table_args__ = (
+        UniqueConstraint("direccion", "dueno_id", name="_unique_direccion_dueno_id"),
+    )
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     dueno: Dueno = Relationship(back_populates="cocheras")
     reservas: List["Reserva"] = Relationship(back_populates="cochera")
-    __table_args__ = (
-        {"UniqueConstraint": ("direccion", "dueno_id")},
-    )
     
 ########  USUARIO MODEL ########
 class UsuarioBase(SQLModel):
